@@ -20,4 +20,4 @@ Você pode usar [Live Server extension](https://marketplace.visualstudio.com/ite
 
 Para aprender a usar o GitHub Copilot vamos completar uma série de tarefas para melhorar esse projeto
 
-Vamos usar o arquivo [workshop-prompts](./workshop-prompts.md) pra começar
+Vamos usar o arquivo [workshop-prompts](https://github.com/pachicodes/copilot-tarefas-dev/blob/main/prompts.md) pra começar

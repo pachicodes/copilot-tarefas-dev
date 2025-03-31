@@ -1,6 +1,6 @@
 # Workshop: Construindo um Gerenciador de Tarefas com GitHub Copilot - Prompts
 
-Vamos atualizar este aplicativo usando o GitHub Copilot. Queremos implementar o seguinte:
+Vamos melhorar este aplicativo usando o GitHub Copilot. Queremos implementar o seguinte:
 
 ## Gerenciamento Básico de Tarefas:
 - Adicionar funcionalidade de edição de tarefas

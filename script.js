@@ -163,3 +163,32 @@ class TaskManager {
 
 // Initialize the task manager
 const taskManager = new TaskManager();
+
+document.addEventListener('DOMContentLoaded', function() {
+    const themeToggle = document.querySelector('.theme-toggle');
+    const body = document.body;
+
+    // Verifica se há uma preferência salva no localStorage
+    if (localStorage.getItem('theme') === 'dark') {
+        body.classList.add('dark-theme');
+        themeToggle.textContent = '☀️';
+    } else {
+        themeToggle.textContent = '🌙';
+    }
+
+    // Alterna entre temas claro e escuro
+    themeToggle.addEventListener('click', function() {
+        if (body.classList.contains('dark-theme')) {
+            body.classList.remove('dark-theme');
+            localStorage.setItem('theme', 'light');
+            themeToggle.textContent = '🌙';
+        } else {
+            body.classList.add('dark-theme');
+            localStorage.setItem('theme', 'dark');
+            themeToggle.textContent = '☀️';
+        }
+    });
+
+    // Resto da funcionalidade do aplicativo
+    // ...
+});

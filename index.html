@@ -71,6 +71,11 @@
                         </select>
                     </div>
                 </div>
+                <div class="tasks-actions">
+                    <button id="exportCSV" class="export-btn">
+                        <span>📊 Exportar CSV</span>
+                    </button>
+                </div>
                 <div id="tasksList">
                     <!-- Exemplo de tarefa -->
                     <div class="task-item">
@@ -97,6 +102,48 @@
             <div class="stat-card">
                 <span class="stat-number" id="highPriorityTasks">1</span>
                 <span class="stat-label">Prioridade alta</span>
+            </div>
+        </div>
+
+        <div class="pomodoro-section card">
+            <h2>🍅 Pomodoro Timer</h2>
+            
+            <div class="pomodoro-display">
+                <div class="timer-display">
+                    <span id="minutes">25</span>:<span id="seconds">00</span>
+                </div>
+                <div class="timer-label" id="timer-label">Foco</div>
+            </div>
+            
+            <div class="pomodoro-controls">
+                <button id="start-timer" class="pomodoro-btn">Iniciar</button>
+                <button id="pause-timer" class="pomodoro-btn" disabled>Pausar</button>
+                <button id="reset-timer" class="pomodoro-btn">Resetar</button>
+            </div>
+            
+            <div class="pomodoro-presets">
+                <h3>Predefinições</h3>
+                <div class="preset-buttons">
+                    <button class="preset-btn" data-work="15" data-break="5">15/5</button>
+                    <button class="preset-btn" data-work="25" data-break="5">25/5</button>
+                    <button class="preset-btn active" data-work="30" data-break="10">30/10</button>
+                    <button class="preset-btn" data-work="60" data-break="20">60/20</button>
+                </div>
+            </div>
+            
+            <div class="pomodoro-custom">
+                <h3>Personalizado</h3>
+                <div class="custom-inputs">
+                    <div class="custom-input-group">
+                        <label for="custom-work">Trabalho (min)</label>
+                        <input type="number" id="custom-work" min="1" max="120" value="25">
+                    </div>
+                    <div class="custom-input-group">
+                        <label for="custom-break">Pausa (min)</label>
+                        <input type="number" id="custom-break" min="1" max="60" value="5">
+                    </div>
+                    <button id="apply-custom" class="pomodoro-btn">Aplicar</button>
+                </div>
             </div>
         </div>
     </div>

@@ -166,16 +166,16 @@ function toggleTheme() {
   const body = document.body;
   const themeToggle = document.querySelector('.theme-toggle');
   
-  // Alternar o tema
+  // Verificar se o tema atual é escuro
   if (body.classList.contains('dark-theme')) {
     // Mudar para tema claro
     body.classList.remove('dark-theme');
-    themeToggle.textContent = '🌙'; // emoji lua
+    if (themeToggle) themeToggle.textContent = '🌙'; // emoji lua
     localStorage.setItem('theme', 'light');
   } else {
     // Mudar para tema escuro
     body.classList.add('dark-theme');
-    themeToggle.textContent = '☀️'; // emoji sol
+    if (themeToggle) themeToggle.textContent = '☀️'; // emoji sol
     localStorage.setItem('theme', 'dark');
   }
 }
@@ -187,8 +187,226 @@ function loadSavedTheme() {
   
   if (savedTheme === 'dark') {
     document.body.classList.add('dark-theme');
-    themeToggle.textContent = '☀️';
+    if (themeToggle) themeToggle.textContent = '☀️';
   }
+}
+
+// Temporizador Pomodoro
+
+// Variáveis do temporizador
+let timer;
+let isRunning = false;
+let isPause = false;
+let minutes = 25;
+let seconds = 0;
+let workTime = 25;
+let breakTime = 5;
+
+// Elementos DOM
+const minutesDisplay = document.getElementById('minutes');
+const secondsDisplay = document.getElementById('seconds');
+const timerLabel = document.getElementById('timer-label');
+const startBtn = document.getElementById('start-timer');
+const pauseBtn = document.getElementById('pause-timer');
+const resetBtn = document.getElementById('reset-timer');
+const presetBtns = document.querySelectorAll('.preset-btn');
+const applyCustomBtn = document.getElementById('apply-custom');
+const customWorkInput = document.getElementById('custom-work');
+const customBreakInput = document.getElementById('custom-break');
+
+// Sons de notificação (opcional)
+const workCompleteSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3');
+const breakCompleteSound = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3');
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+    // Configuração dos botões do Pomodoro
+    startBtn.addEventListener('click', startTimer);
+    pauseBtn.addEventListener('click', pauseTimer);
+    resetBtn.addEventListener('click', resetTimer);
+    
+    // Configuração dos presets
+    presetBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            presetBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            workTime = parseInt(btn.dataset.work);
+            breakTime = parseInt(btn.dataset.break);
+            
+            resetTimer();
+        });
+    });
+    
+    // Configuração personalizada
+    applyCustomBtn.addEventListener('click', () => {
+        const customWork = parseInt(customWorkInput.value);
+        const customBreak = parseInt(customBreakInput.value);
+        
+        if (customWork > 0 && customBreak > 0) {
+            workTime = customWork;
+            breakTime = customBreak;
+            
+            presetBtns.forEach(b => b.classList.remove('active'));
+            resetTimer();
+        }
+    });
+    
+    // Inicializar com os valores padrão
+    updateTimerDisplay();
+});
+
+// Funções do temporizador
+function startTimer() {
+    if (!isRunning) {
+        isRunning = true;
+        startBtn.disabled = true;
+        pauseBtn.disabled = false;
+        
+        timer = setInterval(() => {
+            if (seconds > 0) {
+                seconds--;
+            } else {
+                if (minutes > 0) {
+                    minutes--;
+                    seconds = 59;
+                } else {
+                    // Temporizador completo
+                    clearInterval(timer);
+                    
+                    if (isPause) {
+                        // Terminou a pausa, muda para sessão de trabalho
+                        isPause = false;
+                        minutes = workTime;
+                        timerLabel.textContent = "Foco";
+                        breakCompleteSound.play().catch(() => {});
+                        
+                        // Notificação
+                        if (Notification.permission === "granted") {
+                            new Notification("Pomodoro", {
+                                body: "Hora de voltar ao trabalho!",
+                                icon: "https://img.icons8.com/color/48/000000/tomato.png"
+                            });
+                        }
+                    } else {
+                        // Terminou o trabalho, muda para sessão de pausa
+                        isPause = true;
+                        minutes = breakTime;
+                        timerLabel.textContent = "Pausa";
+                        workCompleteSound.play().catch(() => {});
+                        
+                        // Notificação
+                        if (Notification.permission === "granted") {
+                            new Notification("Pomodoro", {
+                                body: "Hora da pausa! Descanse um pouco.",
+                                icon: "https://img.icons8.com/color/48/000000/coffee--v1.png"
+                            });
+                        }
+                    }
+                    
+                    startTimer();
+                }
+            }
+            
+            updateTimerDisplay();
+        }, 1000);
+    }
+}
+
+function pauseTimer() {
+    clearInterval(timer);
+    isRunning = false;
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+}
+
+function resetTimer() {
+    clearInterval(timer);
+    isRunning = false;
+    isPause = false;
+    minutes = workTime;
+    seconds = 0;
+    timerLabel.textContent = "Foco";
+    startBtn.disabled = false;
+    pauseBtn.disabled = true;
+    updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+    minutesDisplay.textContent = minutes < 10 ? `0${minutes}` : minutes;
+    secondsDisplay.textContent = seconds < 10 ? `0${seconds}` : seconds;
+    
+    // Remover animação de piscar
+    minutesDisplay.parentElement.classList.remove('timer-complete');
+    
+    // Adicionar animação de piscar nos últimos 10 segundos
+    if (minutes === 0 && seconds <= 10 && isRunning) {
+        minutesDisplay.parentElement.classList.add('timer-complete');
+    }
+}
+
+// Solicitar permissão para notificações
+function requestNotificationPermission() {
+    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+        Notification.requestPermission();
+    }
+}
+
+// Solicita permissão quando o usuário interage com o temporizador pela primeira vez
+startBtn.addEventListener('click', requestNotificationPermission);
+
+// Função para exportar tarefas como CSV
+function exportTasksToCSV() {
+  // Obter todas as tarefas
+  const tasks = getTasks();
+  
+  if (tasks.length === 0) {
+    alert('Não há tarefas para exportar.');
+    return;
+  }
+  
+  // Definir cabeçalhos CSV
+  const headers = [
+    'ID', 
+    'Título', 
+    'Descrição', 
+    'Categoria', 
+    'Prioridade', 
+    'Data de Entrega', 
+    'Completada', 
+    'Data de Criação', 
+    'Última Atualização'
+  ];
+  
+  // Criar a linha de cabeçalho
+  let csvContent = headers.join(',') + '\n';
+  
+  // Adicionar cada tarefa ao conteúdo CSV
+  tasks.forEach(task => {
+    // Processar descrição para evitar quebras de linha e vírgulas
+    const safeDescription = task.description ? 
+      `"${task.description.replace(/"/g, '""')}"` : '';
+      
+    const row = [
+      task.id,
+      `"${task.title.replace(/"/g, '""')}"`,
+      safeDescription,
+      task.category,
+      task.priority,
+      task.dueDate || '',
+      task.completed ? 'Sim' : 'Não',
+      formatDateForCSV(task.createdAt),
+      formatDateForCSV(task.updatedAt)
+    ];
+    
+    csvContent += row.join(',') + '\n';
+  });
+  
+  // Criar o blob e disparar o download
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  
+  // Criar um link
 }
 
 // Initialize the task manager
@@ -222,5 +440,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Carregar o tema preferido do usuário
     loadSavedTheme();
   
+    // Adicionar evento ao botão de exportação CSV
+    const exportCSVBtn = document.getElementById('exportCSV');
+    if (exportCSVBtn) {
+        exportCSVBtn.addEventListener('click', exportTasksToCSV);
+    }
+  
     // Outros códigos de inicialização...
+  
+    // Certifique-se de que o toggle de tema está funcionando
+    if (themeToggle && typeof toggleTheme === 'function') {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
 });
+
+<div class="export-btn-container">
+  <button id="exportCSV" class="export-btn" title="Exportar tarefas como CSV">
+    <span>📊 Exportar CSV</span>
+  </button>
+</div>

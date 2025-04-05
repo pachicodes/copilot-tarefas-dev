@@ -161,6 +161,36 @@ class TaskManager {
     }
 }
 
+// Função para alternar entre os temas
+function toggleTheme() {
+  const body = document.body;
+  const themeToggle = document.querySelector('.theme-toggle');
+  
+  // Alternar o tema
+  if (body.classList.contains('dark-theme')) {
+    // Mudar para tema claro
+    body.classList.remove('dark-theme');
+    themeToggle.textContent = '🌙'; // emoji lua
+    localStorage.setItem('theme', 'light');
+  } else {
+    // Mudar para tema escuro
+    body.classList.add('dark-theme');
+    themeToggle.textContent = '☀️'; // emoji sol
+    localStorage.setItem('theme', 'dark');
+  }
+}
+
+// Função para carregar o tema salvo
+function loadSavedTheme() {
+  const savedTheme = localStorage.getItem('theme');
+  const themeToggle = document.querySelector('.theme-toggle');
+  
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+    themeToggle.textContent = '☀️';
+  }
+}
+
 // Initialize the task manager
 const taskManager = new TaskManager();
 
@@ -189,6 +219,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Resto da funcionalidade do aplicativo
-    // ...
+    // Carregar o tema preferido do usuário
+    loadSavedTheme();
+  
+    // Outros códigos de inicialização...
 });
